@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [TripController::class, 'index'])->name('home');
 Route::get('trips/{schedule}/seats', [TripController::class, 'seats'])->name('trips.seats');
 
+// Booking a seat is tied to a user (for the ticket + payment).
+Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
-
-    // Booking a seat is tied to a user (for the ticket + payment).
-    Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
-    Route::get('bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 
     // Admin — every signed-in user is an operator/admin (single-operator model).
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -48,4 +48,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

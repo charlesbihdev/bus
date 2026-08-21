@@ -28,7 +28,6 @@ class BookingService
      * @throws SeatsUnavailableException
      */
     public function hold(
-        User $user,
         Departure $departure,
         array $seatLabels,
         string $contactName,
@@ -40,7 +39,12 @@ class BookingService
         $unit = $departure->priceInPesewas();
 
         return DB::transaction(function () use (
-            $user, $departure, $seatLabels, $contactName, $contactPhone, $passengerNames, $unit
+            $departure,
+            $seatLabels,
+            $contactName,
+            $contactPhone,
+            $passengerNames,
+            $unit
         ) {
             $clash = array_intersect($seatLabels, $this->availability->takenSeats($departure));
             if ($clash !== []) {
@@ -48,8 +52,7 @@ class BookingService
             }
 
             $booking = $departure->bookings()->create([
-                'user_id' => $user->id,
-                'reference' => 'BB-'.strtoupper(Str::random(8)),
+                'reference' => 'BB-' . strtoupper(Str::random(8)),
                 'contact_name' => $contactName,
                 'contact_phone' => $contactPhone,
                 'total_amount' => $unit * count($seatLabels),

@@ -31,12 +31,11 @@ class BookingController extends Controller
 
         $unknown = $availability->unknownSeats($departure, $data['seats']);
         if ($unknown !== []) {
-            return back()->withErrors(['seats' => 'Unknown seat(s): '.implode(', ', $unknown)]);
+            return back()->withErrors(['seats' => 'Unknown seat(s): ' . implode(', ', $unknown)]);
         }
 
         try {
             $booking = $bookings->hold(
-                $request->user(),
                 $departure,
                 $data['seats'],
                 $data['contact_name'],
@@ -44,7 +43,7 @@ class BookingController extends Controller
                 $data['passenger_names'] ?? [],
             );
         } catch (SeatsUnavailableException $e) {
-            return back()->withErrors(['seats' => 'Sorry, seat(s) '.implode(', ', $e->seats).' were just taken.']);
+            return back()->withErrors(['seats' => 'Sorry, seat(s) ' . implode(', ', $e->seats) . ' were just taken.']);
         }
 
         return to_route('bookings.show', $booking);
@@ -53,7 +52,7 @@ class BookingController extends Controller
     /** Checkout summary for a pending/paid booking. */
     public function show(Request $request, Booking $booking): Response
     {
-        abort_unless($booking->user_id === $request->user()->id, 403);
+        // abort_unless($booking->user_id === $request->user()->id, 403);
 
         $booking->load(['seats', 'departure.schedule.route.origin', 'departure.schedule.route.destination']);
         $route = $booking->departure->schedule->route;
